@@ -1,5 +1,5 @@
 import React from 'react'
-import { useClerk, UserButton, useUser } from "@clerk/react";
+import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 
 const Navbar = () => {
 
