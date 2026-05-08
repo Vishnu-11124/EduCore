@@ -11,28 +11,36 @@ export const dummyEducatorData = {
 }
 
 export const dummyTestimonial = [
-    {
-        name: 'Donald Jackman',
-        role: 'SWE 1 @ Amazon',
-        image: 'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yckFqTjBNa3l6c3h1aG9sVjNqQnVhWjAifQ',
-        rating: 5,
-        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-    },
-    {
-        name: 'Richard Nelson',
-        role: 'SWE 2 @ Samsung',
-        image: 'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ycVFsdmFMSkw3ckIxNHZMU2o4ZURWNEtmR2IifQ',
-        rating: 4,
-        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-    },
-    {
-        name: 'James Washington',
-        role: 'SWE 2 @ Google',
-        image: 'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18ycVFsdmFMSkw3ckIxNHZMU2o4ZURWNEtmR2IifQ',
-        rating: 4.5,
-        feedback: 'I\'ve been using Imagify for nearly two years, primarily for Instagram, and it has been incredibly user-friendly, making my work much easier.',
-    },
-];
+  {
+    name: 'Donald Jackman',
+    role: 'Frontend Developer @ Amazon',
+    image:
+      'https://images.pexels.com/photos/17218597/pexels-photo-17218597.png',
+    rating: 5,
+    feedback:
+      'EduCore completely changed the way I learn online. The courses are practical, easy to follow, and packed with real-world projects. After completing the MERN stack path, I felt far more confident in interviews and development work.',
+  },
+
+  {
+    name: 'Richard Nelson',
+    role: 'Software Engineer @ Samsung',
+    image:
+      'https://images.pexels.com/photos/7752816/pexels-photo-7752816.jpeg',
+    rating: 4,
+    feedback:
+      'The learning experience feels smooth and modern. I really liked the hands-on assignments and clean explanations. The platform helped me strengthen my backend and problem-solving skills in a short time.',
+  },
+
+  {
+    name: 'James Washington',
+    role: 'Backend Engineer @ Google',
+    image:
+      'https://images.pexels.com/photos/7752850/pexels-photo-7752850.jpeg',
+    rating: 5,
+    feedback:
+      'One of the best online learning platforms I’ve used. The roadmap structure, project-based teaching, and interview preparation content made a huge difference in my growth as a developer.',
+  },
+]
 
 export const dummyDashboardData = {
     "totalEarnings": 707.38,

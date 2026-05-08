@@ -1,17 +1,25 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { AppContext } from "../../context/AppContext";
 import CourseCard from "./CourseCard";
+
 const CourseSection = () => {
-  const {allCourses} = useContext(AppContext)
-  console.log(allCourses)
+  const { allCourses } = useContext(AppContext);
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">
-        
+
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto"
+        >
           <span className="inline-block px-4 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-100 rounded-full">
             Top Courses
           </span>
@@ -25,19 +33,31 @@ const CourseSection = () => {
             Join thousands of students who have transformed their careers with
             our expertly designed and industry-focused courses.
           </p>
-        </div>
+        </motion.div>
 
         {/* Course Cards */}
         <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {
-            allCourses.slice(0,4).map((course, index) => 
-              <CourseCard key={index} course={course} />
-          )
-          }
+          {allCourses.slice(0, 4).map((course, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <CourseCard course={course} />
+            </motion.div>
+          ))}
         </div>
 
         {/* Button */}
-        <div className="mt-14 flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-14 flex justify-center"
+        >
           <Link
             to="/course-list"
             onClick={() => scrollTo(0, 0)}
@@ -46,7 +66,7 @@ const CourseSection = () => {
             View All Courses
             <ArrowRight className="w-5 h-5" />
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
