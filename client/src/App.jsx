@@ -11,7 +11,8 @@ import Dashboard from "./pages/educator/Dashboard";
 import AddCourse from "./pages/educator/AddCourse";
 import MyCourses from "./pages/educator/MyCourses";
 import StudentsEntrolled from "./pages/educator/StudentsEntrolled";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/students/Navbar";
+
 
 const App = () => {
   return (
