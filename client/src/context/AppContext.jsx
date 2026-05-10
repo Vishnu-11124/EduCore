@@ -1,11 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import { dummyCourses } from "../assets/assets";
+import humanizeDuration from "humanize-duration";
 
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
   const [allCourses, setAllCourses] = useState([]);
-  const [ isEducator, setIsEducator ] = useState(true)
+  const [isEducator, setIsEducator] = useState(true);
 
   // fetch all courses and set to state
   const fetchAllCourses = async () => {
@@ -13,7 +14,10 @@ export const AppContextProvider = (props) => {
   };
 
   const calculateRating = (course) => {
-    if (course.courseRatings.length === 0) return 0;
+    // Prevent errors when course is null/undefined
+    if (!course || !course.courseRatings || course.courseRatings.length === 0) {
+      return 0;
+    }
 
     const totalRating = course.courseRatings.reduce(
       (sum, item) => sum + item.rating,
@@ -23,6 +27,58 @@ export const AppContextProvider = (props) => {
     return (totalRating / course.courseRatings.length).toFixed(1);
   };
 
+
+// Chapter duration
+const calculateChapterTime = (chapter) => {
+
+  if (!chapter || !chapter.chapterContent) return "0m";
+
+  const totalMinutes = chapter.chapterContent.reduce(
+    (total, lecture) => total + lecture.lectureDuration,
+    0
+  );
+
+  return humanizeDuration(totalMinutes * 60 * 1000, {
+    units: ["h", "m"],
+    round: true,
+  });
+};
+
+// Course duration
+const calculateCourseDuration = (course) => {
+
+  if (!course || !course.courseContent) return "0m";
+
+  const totalMinutes = course.courseContent.reduce((chapterTotal, chapter) => {
+
+    const chapterMinutes = chapter.chapterContent.reduce(
+      (lectureTotal, lecture) =>
+        lectureTotal + lecture.lectureDuration,
+      0
+    );
+
+    return chapterTotal + chapterMinutes;
+
+  }, 0);
+
+  return humanizeDuration(totalMinutes * 60 * 1000, {
+    units: ["h", "m"],
+    round: true,
+  });
+};
+
+// Total lectures
+const calculateNoOfLectures = (course) => {
+
+  if (!course || !course.courseContent) return 0;
+
+  return course.courseContent.reduce(
+    (total, chapter) =>
+      total + chapter.chapterContent.length,
+    0
+  );
+};
+
   useEffect(() => {
     fetchAllCourses();
   }, []);
@@ -30,7 +86,11 @@ export const AppContextProvider = (props) => {
   const value = {
     allCourses,
     calculateRating,
-    isEducator, setIsEducator
+    calculateChapterTime,
+    calculateCourseDuration,
+    calculateNoOfLectures,
+    isEducator,
+    setIsEducator,
   };
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
