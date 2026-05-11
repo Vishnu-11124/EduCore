@@ -81,7 +81,7 @@ const calculateNoOfLectures = (course) => {
 
   useEffect(() => {
     fetchAllCourses();
-  }, []);
+  }, [allCourses]);
 
   const value = {
     allCourses,

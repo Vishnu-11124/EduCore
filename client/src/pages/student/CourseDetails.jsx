@@ -4,6 +4,7 @@ import { AppContext } from "../../context/AppContext";
 import { ChevronDown, Currency, Play, Star } from "lucide-react";
 import humanizeDuration from "humanize-duration";
 import Footer from "../../components/students/Footer";
+import YouTube from "react-youtube";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -11,6 +12,7 @@ const CourseDetails = () => {
   const [courseData, setCourseData] = useState(null);
   const [openSection, setOpenSection] = useState({});
   const [isEntrolled, setIsEnrolled] = useState(false);
+  const [playerData, setPlayerData] = useState(null);
 
   const {
     allCourses,
@@ -178,8 +180,12 @@ const CourseDetails = () => {
                             </p>
 
                             {lecture?.isPreviewFree && (
-                              <span className="inline-block mt-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
-                                Preview
+                              <span
+                              onClick={() => setPlayerData({
+                                videoId: lecture.lectureUrl.split('/').pop()
+                              })}
+                              className="inline-block mt-2 cursor-pointer text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                                Previews
                               </span>
                             )}
 
@@ -233,12 +239,21 @@ const CourseDetails = () => {
       <div className="order-1 lg:order-2">
 
         <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm lg:sticky lg:top-24">
-
-          <img
-            src={courseData?.courseThumbnail}
-            alt="course thumbnail"
-            className="w-full h-56 sm:h-72 lg:h-56 object-cover"
-          />
+           {
+              playerData ?
+              (
+                <YouTube videoId={playerData.videoId} opts={{playerVars: {
+                  autoplay: 1
+                }}} iframeClassName="w-full aspect-video" />
+              ):
+              (
+                <img
+                  src={courseData?.courseThumbnail}
+                  alt="course thumbnail"
+                  className="w-full h-56 sm:h-72 lg:h-56 object-cover"
+                />
+              )
+            }   
 
           <div className="p-5 sm:p-6">
 
