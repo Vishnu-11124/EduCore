@@ -5,6 +5,7 @@ export const clerkWebhooks = async (req, res) => {
   const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
   const payload = req.body;
+  console.log("Payload", payload)
 
   const headers = {
     "svix-id": req.headers["svix-id"],
