@@ -16,14 +16,21 @@ export const clerkWebhooks = async (req, res) => {
   let event;
 
   try {
-    event = whook.verify(payload, headers);
-  } catch (err) {
-    return res.status(400).json({ message: "Invalid webhook signature" });
-  }
+  event = whook.verify(payload, headers);
+  console.log("Webhook verified successfully");
+} catch (err) {
+  console.error("Verification Error:", err.message);
+  return res.status(400).json({
+    message: "Invalid webhook signature",
+    error: err.message,
+  });
+}
 
   const { data, type } = event;
   console.log("Event", event)
 
+  
+  try {
   switch (type) {
     case "user.created": {
       await User.create({
@@ -32,6 +39,7 @@ export const clerkWebhooks = async (req, res) => {
         email: data.email_addresses[0].email_address,
         imageUrl: data.image_url,
       });
+      console.log("User created:", user?._id)
       break;
     }
 
@@ -49,6 +57,19 @@ export const clerkWebhooks = async (req, res) => {
       break;
     }
   }
+
+  console.log("Webhook completed successfully");
+
+  return res.json({ success: true });
+
+} catch (error) {
+  console.error("MongoDB Error:", error);
+
+  return res.status(500).json({
+    success: false,
+    error: error.message,
+  });
+}
 
   return res.json({ success: true });
 };
