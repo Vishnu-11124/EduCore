@@ -17,19 +17,18 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
-app.use(clerkMiddleware())
+
 
 // clerk webhook 
-app.post("/clerk", express.raw({ type: "application/json" }), clerkWebhooks);
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-
+app.use(clerkMiddleware())
 
 // routes
 app.get("/", (req, res) => {
     res.send("Api working")
 })
+app.post("/clerk", clerkWebhooks);
 app.use("/api/educator", educatorRouter)
 
 // port

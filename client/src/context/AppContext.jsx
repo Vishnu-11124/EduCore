@@ -95,7 +95,8 @@ const fetchEnrolledCourses = async () => {
   }, [allCourses]);
 
   const logToken = async () => {
-    console.log(await getToken())
+    console.log("Id: ", await getToken())
+    console.log(user)
   }
 
   useEffect(() => {

@@ -1,17 +1,23 @@
-import { clerkClient } from "@clerk/express";
+import { clerkClient, getAuth } from "@clerk/express";
 
-// role update
-export const updateRoleToEducator = async () => {
-    try {
-        const userId = req.auth.userId
-        
-        await clerkClient.users.updateUser(userId, {
-            publicMetadata: {
-                role: 'educator'
-            }
-        })
-        res.json({success: true, message: 'Role updated successfully'})
-    } catch (error) {
-        res.status(500).json({success: false, message: error.message})
+
+export const updateRoleToEducator = async (req, res) => {
+  try {
+    const userId = req.auth().userId;
+
+    if(!userId){
+      return res.status(400).json({ error: "User ID is required" });
     }
+
+    await clerkClient.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        role: "educator",
+      },
+    });
+
+    res.status(200).json({ success: true, message: "Role updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  
+  }
 }
