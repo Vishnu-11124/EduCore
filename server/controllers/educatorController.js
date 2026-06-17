@@ -1,6 +1,6 @@
 import { clerkClient, getAuth } from "@clerk/express";
 
-
+// update role
 export const updateRoleToEducator = async (req, res) => {
   try {
     const userId = req.auth().userId;

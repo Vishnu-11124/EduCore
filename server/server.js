@@ -5,12 +5,15 @@ import connectDB from "./configs/db.js";
 import { clerkWebhooks } from "./controllers/webhooks.js";
 import { clerkMiddleware } from "@clerk/express";
 import educatorRouter from "./routes/educatorRoute.js";
+import connectCloudinary from "./configs/cloudinary.js";
 
 // dotenv.config();
 const app = express()
 
 //connect to database
 connectDB()
+// connect to cloudinary
+await connectCloudinary()
 
 // middleware
 app.use(cors({
