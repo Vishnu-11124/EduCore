@@ -59,3 +59,22 @@ export const addCourse = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+
+// get educator courses
+export const getEducatorCourses = async (req, res) => {
+  try {
+    const educator = req.auth().userId
+    if(!educator){
+       return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const courses = await Course.find({educator})
+    if(courses.length === 0 ){
+      return res.status(400).json({ success: false, message: "You haven't created any courses yet."})
+    }
+
+    res.status(200).json({ success: true, message: "Successfully fetched course data..", data: courses})
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message})
+  }
+}
