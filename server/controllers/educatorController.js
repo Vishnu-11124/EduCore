@@ -72,21 +72,17 @@ export const getEducatorCourses = async (req, res) => {
 
     const courses = await Course.find({ educator });
     if (courses.length === 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "You haven't created any courses yet.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "You haven't created any courses yet.",
+      });
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Successfully fetched course data..",
-        data: courses,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched course data..",
+      data: courses,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -143,14 +139,73 @@ export const educatorDashboardData = async (req, res) => {
       });
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Successfully fetched dashboard data",
-        data: { totalEarnings, enrolledStudentsData, totalCourses },
-      });
+    res.status(200).json({
+      success: true,
+      message: "Successfully fetched dashboard data",
+      data: { totalEarnings, enrolledStudentsData, totalCourses },
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// enrolled students data with purchase data
+export const getEnrolledStudentsData = async (req, res) => {
+  try {
+    const educator = req.auth().userId;
+
+    if (!educator) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    const courses = await Course.find({ educator });
+
+    if (courses.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No courses found",
+        data: [],
+      });
+    }
+
+    const courseIds = courses.map((course) => course._id);
+
+    const purchases = await Purchase.find({
+      courseId: { $in: courseIds },
+      status: "completed",
+    }).populate("courseId", "courseTitle");
+
+    const userIds = purchases.map((purchase) => purchase.userId);
+
+    const users = await User.find(
+      { clerkId: { $in: userIds } },
+      "clerkId name imageUrl",
+    );
+
+    const userMap = {};
+
+    users.forEach((user) => {
+      userMap[user.clerkId] = user;
+    });
+
+    const enrolledStudents = purchases.map((purchase) => ({
+      student: userMap[purchase.userId] || null,
+      courseTitle: purchase.courseId?.courseTitle,
+      purchaseDate: purchase.createdAt,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully fetched students data",
+      data: enrolledStudents,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
