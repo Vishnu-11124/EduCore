@@ -6,6 +6,7 @@ import { clerkWebhooks } from "./controllers/webhooks.js";
 import { clerkMiddleware } from "@clerk/express";
 import educatorRouter from "./routes/educatorRoute.js";
 import connectCloudinary from "./configs/cloudinary.js";
+import courseRouter from "./routes/courseRouter.js";
 
 // dotenv.config();
 const app = express()
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 })
 app.post("/clerk", clerkWebhooks);
 app.use("/api/educator", educatorRouter)
+app.use('/api/courses', courseRouter)
 
 // port
 const PORT = process.env.PORT || 5000
