@@ -1,7 +1,7 @@
 
 import Purchase from '../models/Purchase.js'
 import User from '../models/User.js'
-import Stripe from 'stripe'
+import { stripeInstance } from '../configs/stripe.js'
 import Course from '../models/Course.js'
 
 // get user data
@@ -45,67 +45,119 @@ export const userEnrolledCourses = async (req, res) =>{
 // purchase course
 export const purchaseCourse = async (req, res) => {
     try {
-        const { courseId } = req.body
-        if(!courseId){
-            return res.status(404).json({ success: false, message: "Course id is not available!"})
-        }
-        const { origin } = req.headers
-        if(!origin){
-            return res.status(404).json({ success: false, message: "Origin is not available!"})
-        }
-        const userId = req.auth().userId
-        if(!userId){
-            return res.status(404).json({ success: false, message: "User id is not available!"})
-        }
-        const userData = await User.findById(userId)
-        if(!userData){
-            return res.status(404).json({ success: false, message: "User data is not available!"})
-        }
-        const courseData = await Course.findById(courseId)
-        if(!courseData){
-            return res.status(404).json({ success: false, message: "Course data is not available!"})
+        const { courseId } = req.body;
+
+        if (!courseId) {
+            return res.status(400).json({
+                success: false,
+                message: "Course id is required!"
+            });
         }
 
-        const purchaseData = {
-            courseId: courseData._id,
+        const userId = req.auth().userId;
+
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: "Unauthorized!"
+            });
+        }
+
+        const userData = await User.findById(userId);
+
+        if (!userData) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found!"
+            });
+        }
+
+        const courseData = await Course.findById(courseId);
+
+        if (!courseData) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found!"
+            });
+        }
+
+        // Prevent duplicate purchase
+        const alreadyPurchased = await Purchase.findOne({
             userId,
-            amount: (courseData.coursePrice -courseData.discount * courseData.coursePrice / 100).toFixed(2),
+            courseId
+        });
+
+        if (alreadyPurchased) {
+            return res.status(400).json({
+                success: false,
+                message: "You have already purchased this course!"
+            });
         }
 
-        const newPurchase = await Purchase.create(purchaseData)
-        if(!newPurchase){
-            return res.status(404).json({ success: false, message: "Purchase data is not available!"})
+        // Calculate final amount after discount
+        const amount = Number(
+            (
+                courseData.coursePrice -
+                (courseData.discount * courseData.coursePrice) / 100
+            ).toFixed(2)
+        );
+
+        if (amount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid course price!"
+            });
         }
-        
-        // stripe gateway
-        const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-        const currency = process.env.CURRENCY.toLowerCase()
-
-        // creating items
-        const line_items = [{
-            price_data : {
-                currency,
-                product_data: {
-                    name: courseData?.courseTitle
-                },
-                unit_amount: Math.floor(newPurchase?.amount) * 100
-            },
-            quantity: 1
-        }]
+        // Save purchase with pending status
+        const newPurchase = await Purchase.create({
+            courseId,
+            userId,
+            amount,
+            status: "pending",
+        });
 
         const session = await stripeInstance.checkout.sessions.create({
-            success_url: `${origin}/loading/my-enrollments`,
-            cancel_url: `${origin}/`,
-            line_items: line_items,
-            mode: 'payment',
-            metadata: {
-                purchaseId: newPurchase?._id.toString()
-            }
-        })
+            payment_method_types: ["card"],
 
-        res.status(200).json({ success: true, session_url: session.url })
+            mode: "payment",
+
+            line_items: [
+                {
+                    price_data: {
+                        currency: process.env.CURRENCY.toLowerCase(),
+
+                        product_data: {
+                            name: courseData.courseTitle,
+                        },
+
+                        unit_amount: Math.round(amount * 100),
+                    },
+                    quantity: 1,
+                },
+            ],
+
+            success_url: `${process.env.CLIENT_URL}/loading/my-enrollments`,
+            cancel_url: `${process.env.CLIENT_URL}/`,
+
+            metadata: {
+                purchaseId: newPurchase._id.toString(),
+                userId: userId.toString(),
+                courseId: courseId.toString(),
+            },
+        });
+
+        return res.status(200).json({
+            success: true,
+            session_url: session.url,
+        });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
-}
+};
